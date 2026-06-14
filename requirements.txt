@@ -1,9 +1,7 @@
-crewai>=0.28.0
-crewai-tools
-
-flask==3.0.3
-python-dotenv==1.0.1
-gunicorn==23.0.0
-
-langchain==0.1.20
-openai
+crewai==0.11.2
+crewai-tools==0.1.0
+fastapi
+uvicorn
+python-dotenv
+requests
+pydantic
