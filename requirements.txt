@@ -1,5 +1,5 @@
-crewai==0.11.2
-crewai-tools==0.1.3
+crewai>=0.28.0
+crewai-tools
 
 flask==3.0.3
 python-dotenv==1.0.1
