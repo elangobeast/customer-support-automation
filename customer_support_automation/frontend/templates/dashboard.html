@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | Support Console{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <h1>Tickets</h1>
+        <p class="subtitle">All incoming customer support tickets and their AI-assisted status.</p>
+    </div>
+</div>
+
+<div class="filters">
+    <form method="get" action="{{ url_for('tickets.dashboard') }}" class="filter-form">
+        <label>
+            Status
+            <select name="status" onchange="this.form.submit()">
+                <option value="">All</option>
+                {% for s in ["New", "Triaged", "Researched", "Drafted", "Approved", "Sent"] %}
+                <option value="{{ s }}" {% if status_filter == s %}selected{% endif %}>{{ s }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        <label>
+            Urgency
+            <select name="urgency" onchange="this.form.submit()">
+                <option value="">All</option>
+                {% for u in ["Low", "Medium", "High"] %}
+                <option value="{{ u }}" {% if urgency_filter == u %}selected{% endif %}>{{ u }}</option>
+                {% endfor %}
+            </select>
+        </label>
+        {% if status_filter or urgency_filter %}
+        <a class="btn btn-ghost" href="{{ url_for('tickets.dashboard') }}">Clear filters</a>
+        {% endif %}
+    </form>
+</div>
+
+{% if tickets %}
+<div class="table-wrap">
+    <table class="ticket-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Client</th>
+                <th>Subject</th>
+                <th>Category</th>
+                <th>Urgency</th>
+                <th>Status</th>
+                <th>Created</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ticket in tickets %}
+            <tr data-ticket-id="{{ ticket.id }}">
+                <td class="mono">#{{ ticket.id }}</td>
+                <td>{{ ticket.client.name if ticket.client else "Unknown" }}</td>
+                <td class="subject-cell">{{ ticket.subject }}</td>
+                <td>{{ ticket.category }}</td>
+                <td>
+                    <span class="badge badge-{{ ticket.urgency|lower }}">{{ ticket.urgency }}</span>
+                </td>
+                <td>
+                    <span class="status-pill status-{{ ticket.status|lower }}">{{ ticket.status }}</span>
+                </td>
+                <td class="mono">{{ ticket.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>
+                    <a class="btn btn-small" href="{{ url_for('tickets.ticket_detail', ticket_id=ticket.id) }}">View</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% else %}
+<div class="empty-state">
+    <h2>No tickets yet</h2>
+    <p>New tickets submitted by clients will appear here once the AI crew has processed them.</p>
+    <a class="btn" href="{{ url_for('tickets.submit_ticket') }}">Submit a test ticket</a>
+</div>
+{% endif %}
+{% endblock %}

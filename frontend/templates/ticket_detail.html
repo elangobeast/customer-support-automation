@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% block title %}Ticket #{{ ticket.id }} | Support Console{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <div>
+        <a class="back-link" href="{{ url_for('tickets.dashboard') }}">&larr; Back to dashboard</a>
+        <h1>Ticket #{{ ticket.id }}</h1>
+        <p class="subtitle">{{ ticket.subject }}</p>
+    </div>
+    <div class="header-meta">
+        <span class="badge badge-{{ ticket.urgency|lower }}">{{ ticket.urgency }} urgency</span>
+        <span class="status-pill status-{{ ticket.status|lower }}" id="status-pill">{{ ticket.status }}</span>
+    </div>
+</div>
+
+<div class="ticket-grid">
+    <section class="card">
+        <h2>Original Message</h2>
+        <dl class="meta-list">
+            <dt>From</dt>
+            <dd>{{ ticket.client.name if ticket.client else "Unknown" }}
+                {% if ticket.client %}&lt;{{ ticket.client.email }}&gt;{% endif %}
+            </dd>
+            <dt>Category</dt>
+            <dd>{{ ticket.category }}</dd>
+            <dt>Submitted</dt>
+            <dd>{{ ticket.created_at.strftime('%Y-%m-%d %H:%M') }}</dd>
+        </dl>
+        <div class="message-body">{{ ticket.body }}</div>
+
+        {% if ticket.client %}
+        <h3>Purchase History</h3>
+        {% set history = ticket.client.get_purchase_history() %}
+        {% if history %}
+        <ul class="history-list">
+            {% for item in history %}
+            <li><span class="mono">{{ item.order_id }}</span> &mdash; {{ item.item }}
+                ({{ item.date }}, ${{ "%.2f"|format(item.price) }})</li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p class="muted">No purchase history on file.</p>
+        {% endif %}
+        {% endif %}
+    </section>
+
+    <section class="card">
+        <h2>AI Research Notes</h2>
+        {% if ticket.research_notes %}
+        <pre class="research-notes">{{ ticket.research_notes }}</pre>
+        {% else %}
+        <p class="muted">Research is still in progress. Refresh in a moment.</p>
+        {% endif %}
+    </section>
+
+    <section class="card card-wide">
+        <h2>Draft Response</h2>
+        {% if ticket.status in ["New", "Triaged", "Researched"] %}
+        <p class="muted" id="processing-note">The AI crew is analyzing this ticket&hellip; this page will update automatically.</p>
+        {% endif %}
+
+        <form method="post" action="{{ url_for('tickets.approve_ticket', ticket_id=ticket.id) }}" id="response-form">
+            <label for="final_response">Editable response (review and adjust before sending)</label>
+            <textarea name="final_response" id="final_response" rows="14">{{ ticket.final_response or ticket.ai_draft }}</textarea>
+
+            <div class="actions">
+                <button type="submit" class="btn btn-primary">Approve &amp; Save</button>
+            </div>
+        </form>
+
+        <form method="post" action="{{ url_for('tickets.send_ticket_response', ticket_id=ticket.id) }}" class="send-form">
+            <button type="submit" class="btn btn-accent"
+                {% if ticket.status not in ["Approved", "Sent"] %}disabled{% endif %}>
+                Send Email to Client
+            </button>
+            {% if ticket.status == "Sent" %}
+            <span class="muted">Sent on {{ ticket.updated_at.strftime('%Y-%m-%d %H:%M') }}</span>
+            {% endif %}
+        </form>
+    </section>
+</div>
+
+{% if ticket.status in ["New", "Triaged", "Researched"] %}
+<script>
+    // Poll for status updates while the crew is still processing this ticket
+    pollTicketStatus({{ ticket.id }});
+</script>
+{% endif %}
+{% endblock %}

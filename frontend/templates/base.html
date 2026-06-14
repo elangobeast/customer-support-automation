@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Support Console{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <header class="topbar">
+        <div class="topbar-inner">
+            <a href="{{ url_for('tickets.dashboard') }}" class="brand">
+                <span class="brand-mark">CS</span>
+                <span class="brand-name">Support Console</span>
+            </a>
+            <nav class="topnav">
+                <a href="{{ url_for('tickets.dashboard') }}">Dashboard</a>
+                <a href="{{ url_for('tickets.submit_ticket') }}">Submit Ticket</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="page">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <p>Customer Support Ticket Automation &mdash; powered by CrewAI</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+</body>
+</html>

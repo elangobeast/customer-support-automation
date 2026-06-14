@@ -1,0 +1,46 @@
+{
+  "faqs": [
+    {
+      "topic": "How do I return a defective item?",
+      "content": "If an item arrives defective or stops working within 30 days, contact support with your order ID. We will email you a prepaid return label. Once we receive the item, we will issue a full refund or replacement within 5 business days."
+    },
+    {
+      "topic": "How long do refunds take?",
+      "content": "Approved refunds are processed within 3-5 business days and typically appear on your statement within 7-10 business days, depending on your bank."
+    },
+    {
+      "topic": "Can I change my shipping address after ordering?",
+      "content": "You can change your shipping address within 1 hour of placing an order by contacting support. After that, the order may already be processing and cannot be redirected."
+    },
+    {
+      "topic": "Do you offer order tracking?",
+      "content": "Yes. Once your order ships, you will receive a tracking link via email. Tracking can take up to 24 hours to update after shipment."
+    },
+    {
+      "topic": "What payment methods do you accept?",
+      "content": "We accept all major credit cards, PayPal, and Apple Pay. Payment is charged at the time of order placement."
+    },
+    {
+      "topic": "How do I cancel a subscription?",
+      "content": "Subscriptions can be cancelled anytime from your account settings under 'Manage Subscriptions'. Cancellations take effect at the end of the current billing cycle, and no partial refunds are issued for the remaining period."
+    },
+    {
+      "topic": "My discount code isn't working",
+      "content": "Discount codes are case-sensitive, single-use, and may have a minimum order value or expiration date. Check the terms shown at checkout, or contact support with the code for assistance."
+    }
+  ],
+  "policies": [
+    {
+      "topic": "Refund Policy",
+      "content": "Customers may request a refund within 30 days of purchase for items that are unused, defective, or significantly not as described. Refunds for defective items include free return shipping. Refunds for change-of-mind returns require the customer to cover return shipping and a 10% restocking fee may apply. Refunds are issued to the original payment method within 3-5 business days of approval."
+    },
+    {
+      "topic": "Shipping Policy",
+      "content": "Standard shipping takes 5-7 business days; expedited shipping takes 2-3 business days. Orders over $50 qualify for free standard shipping. Shipping times may be extended during peak seasons. Lost packages should be reported within 14 days of the expected delivery date for a replacement or refund."
+    },
+    {
+      "topic": "Billing Policy",
+      "content": "All charges appear on statements as 'ACME SUPPORT CO'. Duplicate or incorrect charges should be reported within 60 days for investigation. Subscription renewals are charged automatically unless cancelled at least 24 hours before the renewal date."
+    }
+  ]
+}
