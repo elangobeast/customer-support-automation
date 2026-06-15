@@ -12,6 +12,7 @@ during its task.
 """
 
 import json
+from crewai import LLM
 from crewai.tools import tool
 
 
