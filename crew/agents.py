@@ -14,31 +14,23 @@ of the LLM's output for that agent's tasks.
 """
 
 import os
-from crewai import Agent, LLM
+from crewai import Agent
 from config import Config
 from crew.tools import client_history_tool, faq_search_tool, policy_lookup_tool
 
 
 def get_llm():
-    """
-    Build the LLM configuration used by all agents.
-
-    Defaults to OpenAI's gpt-4o-mini via the OPENAI_API_KEY environment
-    variable. To use Anthropic instead, set ANTHROPIC_API_KEY and change
-    the model string below to an Anthropic model (e.g. "anthropic/claude-3-5-haiku").
-    """
     if Config.OPENAI_API_KEY:
         os.environ["OPENAI_API_KEY"] = Config.OPENAI_API_KEY
-        return LLM(model=Config.OPENAI_MODEL_NAME, temperature=0.3)
+        return Config.OPENAI_MODEL_NAME
 
     if Config.ANTHROPIC_API_KEY:
         os.environ["ANTHROPIC_API_KEY"] = Config.ANTHROPIC_API_KEY
-        return LLM(model="anthropic/claude-3-5-haiku-20241022", temperature=0.3)
+        return "anthropic/claude-3-5-haiku-20241022"
 
     raise EnvironmentError(
         "No LLM API key configured. Set OPENAI_API_KEY or ANTHROPIC_API_KEY in .env"
     )
-
 
 def build_triage_agent() -> Agent:
     """
