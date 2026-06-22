@@ -15,109 +15,182 @@ An end-to-end customer support automation system built with **Flask** and
 
 ```
 customer_support_automation/
-├── README.md
-├── requirements.txt
-├── .env.example
-├── run.py
-├── config.py
+│
 ├── backend/
-│   ├── app.py              # Flask app factory + routes registration
-│   ├── models.py           # Client, Ticket, KnowledgeBase models
-│   ├── database.py         # SQLAlchemy init helpers
-│   ├── email_service.py     # SMTP send / IMAP fetch
+│   ├── app.py
+│   ├── models.py
+│   ├── database.py
+│   ├── email_service.py
 │   └── routes/
-│       ├── tickets.py       # dashboard, ticket detail, submit, approve, send
-│       └── webhooks.py      # /webhook/incoming-email
+│       ├── tickets.py
+│       └── webhooks.py
+│
 ├── crew/
-│   ├── agents.py            # Triage, Researcher, Responder agents
-│   ├── tasks.py              # Task definitions (chained via context)
-│   ├── tools.py              # Client history / FAQ / policy lookup tools
-│   └── crew_runner.py        # Assembles and runs the crew per ticket
+│   ├── agents.py
+│   ├── tasks.py
+│   ├── tools.py
+│   └── crew_runner.py
+│
 ├── data/
-│   ├── seed_data.py           # Seeds clients + knowledge base
-│   ├── knowledge_base.json    # Sample FAQs & policies
-│   └── support.db             # SQLite DB (created on first run)
-└── frontend/
-    ├── templates/             # base, dashboard, ticket_detail, submit_ticket
-    └── static/css, static/js
+│   ├── seed_data.py
+│   ├── knowledge_base.json
+│   └── support.db
+│
+├── frontend/
+│   ├── templates/
+│   └── static/
+│
+├── config.py
+├── run.py
+├── requirements.txt
+├── runtime.txt
+└── README.md
 ```
 
-## Setup
+# Setup
 
-1. **Create a virtual environment and install dependencies**
+## 1. Create a Virtual Environment and Install Dependencies
 
-   ```bash
-   python -m venv venv
-   source venv/bin/activate    # On Windows: venv\Scripts\activate
-   pip install -r requirements.txt
-   ```
+```bash
+python -m venv venv
 
-2. **Configure environment variables**
+# Windows
+venv\Scripts\activate
 
-   ```bash
-   cp .env.example .env
-   ```
+# Linux / macOS
+source venv/bin/activate
 
-   Edit `.env` and set at least:
-   - `OPENAI_API_KEY` — required for the CrewAI agents (or set
-     `ANTHROPIC_API_KEY` instead — see `crew/agents.py`)
-   - `SMTP_USERNAME` / `SMTP_PASSWORD` — optional. If left blank, the app
-     runs in **simulation mode**: emails are printed to the console
-     instead of actually sent.
+pip install -r requirements.txt
+```
 
-3. **Seed the database** (sample clients, purchase history, FAQs, policies)
+## 2. Configure Environment Variables
 
-   ```bash
-   python data/seed_data.py
-   ```
+Create a `.env` file from the sample:
 
-4. **Run the app**
+```bash
+cp .env.example .env
+```
 
-   ```bash
-   python run.py
-   ```
+Set the following variables:
 
-5. Open your browser to **http://localhost:5000/dashboard**
+* `OPENAI_API_KEY` – Required for CrewAI agents.
+* `ANTHROPIC_API_KEY` – Optional alternative to OpenAI.
+* `SMTP_USERNAME` – Optional.
+* `SMTP_PASSWORD` – Optional.
 
-## Using the App
+If SMTP credentials are not provided, the application runs in **simulation mode**, and outgoing emails are printed to the console instead of being sent.
 
-- **Submit a ticket**: Go to "Submit Ticket" in the nav bar. Use one of
-  the seeded client emails (e.g. `alice.johnson@example.com`) to see
-  purchase-history-aware responses.
-- **Watch it process**: The ticket detail page polls automatically and
-  refreshes once the AI crew finishes (status changes to "Drafted").
-- **Review & edit**: Edit the AI-generated draft in the text box, then
-  click **Approve & Save**.
-- **Send**: Once approved, click **Send Email to Client**. If SMTP
-  credentials aren't configured, the email is printed to the console
-  instead of actually sent (simulation mode).
+## 3. Seed the Database
 
-## Simulating Incoming Emails
+Populate the database with sample clients, purchase history, FAQs, and policies:
 
-You can simulate an inbound support email via the webhook endpoint:
+```bash
+python data/seed_data.py
+```
+
+## 4. Start the Application
+
+```bash
+python run.py
+```
+
+The server starts on:
+
+```
+http://localhost:5000
+```
+
+Dashboard:
+
+```
+http://localhost:5000/dashboard
+
+```
+
+# Using the Application
+
+### Submit a Ticket
+
+Open:
+
+```
+http://localhost:5000/submit
+```
+
+Use one of the sample client emails:
+
+* `alice.johnson@example.com`
+* `bob.smith@example.com`
+
+to generate personalized responses based on purchase history.
+
+### AI Processing
+
+The CrewAI pipeline automatically processes tickets using three agents:
+
+1. **Triage Agent**
+2. **Research Agent**
+3. **Response Agent**
+
+The ticket status changes from:
+
+```
+Open → Drafted → Approved → Sent
+```
+
+### Review and Approve
+
+Edit the AI-generated response and click:
+
+* **Approve & Save**
+
+### Send Email
+
+Click:
+
+* **Send Email to Client**
+
+If SMTP credentials are missing, the email will be displayed in the console (simulation mode).
+
+---
+
+# Simulating Incoming Emails
+
+Create tickets through the webhook endpoint:
 
 ```bash
 curl -X POST http://localhost:5000/webhook/incoming-email \
-  -H "Content-Type: application/json" \
-  -d '{
-        "from_email": "alice.johnson@example.com",
-        "from_name": "Alice Johnson",
-        "subject": "Refund for headphones",
-        "body": "Hi, I bought wireless headphones last week and they stopped working. I would like a refund."
-      }'
+-H "Content-Type: application/json" \
+-d '{
+      "from_email":"alice.johnson@example.com",
+      "from_name":"Alice Johnson",
+      "subject":"Refund for headphones",
+      "body":"Hi, I bought wireless headphones last week and they stopped working. I would like a refund."
+    }'
 ```
 
-This creates a ticket and kicks off the CrewAI pipeline in the background,
-just like the web form.
+This automatically creates a ticket and triggers the CrewAI workflow.
 
-## Notes
+---
 
-- The database is SQLite by default (`data/support.db`), suitable for
-  local development. Swap `DATABASE_URL` in `.env` for Postgres/MySQL in
-  production.
-- `email_service.fetch_unread_emails()` is provided as a starting point
-  for polling a real inbox via IMAP — wire it into a scheduled job to
-  automatically create tickets from real customer emails.
-- All three CrewAI agents (Triage, Researcher, Responder) and their tasks
-  are defined in `crew/agents.py` and `crew/tasks.py` and run sequentially
-  via `crew/crew_runner.py`.
+# Notes
+
+* SQLite database:
+
+```
+data/support.db
+```
+
+* Change `DATABASE_URL` in `.env` to use PostgreSQL or MySQL in production.
+
+* `backend/email_service.py` contains helper functions for SMTP and IMAP integration.
+
+* The CrewAI workflow is defined in:
+
+```
+crew/agents.py
+crew/tasks.py
+crew/crew_runner.py
+```
+
+and executes sequentially to generate intelligent customer support responses.
